@@ -188,10 +188,10 @@ const InvitationCard = ({ onOpen, t, lang }: { onOpen: () => void; t: any; lang:
           <Heart className="w-6 h-6 text-[#d4af37]" fill="#d4af37" />
         </div>
 
-        <h2 className="font-elegant text-sm uppercase tracking-[0.3em] text-[#d4af37] mb-6">{t.weddingOf}</h2>
-        <h1 className="font-serif text-4xl mb-4 text-neutral-800 leading-tight">
+        <h2 className="font-elegant text-xs sm:text-sm uppercase tracking-[0.3em] text-[#d4af37] mb-4 sm:mb-6">{t.weddingOf}</h2>
+        <h1 className="font-serif text-3xl sm:text-4xl mb-4 text-neutral-800 leading-tight">
           {groomName}<br />
-          <span className="text-2xl font-elegant italic text-[#d4af37]">&</span><br />
+          <span className="text-xl sm:text-2xl font-elegant italic text-[#d4af37]">&</span><br />
           {brideName}
         </h1>
         <div className="space-y-1">
@@ -241,13 +241,13 @@ const HeroScreen = ({ t, hasVisited, lang }: { t: any; hasVisited: boolean; lang
         transition={{ delay: hasVisited ? 0 : 0.2, duration: 0.8 }}
         className="mb-8"
       >
-        <div className="w-20 h-[1px] bg-[#d4af37] mx-auto mb-8" />
-        <h1 className="font-serif text-5xl mb-4 text-neutral-800 leading-tight">
+        <div className="w-16 h-[1px] bg-[#d4af37] mx-auto mb-6 sm:mb-8" />
+        <h1 className="font-serif text-4xl sm:text-5xl mb-4 text-neutral-800 leading-tight">
           {groomName}<br />
-          <span className="text-3xl font-elegant italic text-[#d4af37]">&</span><br />
+          <span className="text-2xl sm:text-3xl font-elegant italic text-[#d4af37]">&</span><br />
           {brideName}
         </h1>
-        <div className="w-20 h-[1px] bg-[#d4af37] mx-auto mt-8" />
+        <div className="w-16 h-[1px] bg-[#d4af37] mx-auto mt-6 sm:mt-8" />
       </motion.div>
       <motion.p
         className="font-elegant text-xl text-neutral-500 tracking-wide"
@@ -286,9 +286,9 @@ const LocationScreen = ({ t, hasVisited }: { t: any; hasVisited: boolean }) => (
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.6 }}
     >
-      <MapPin className="w-8 h-8 mx-auto mb-4 text-[#d4af37]" />
-      <h2 className="font-serif text-3xl mb-2">{t.locations.venue}</h2>
-      <p className="font-elegant text-lg text-white/80 mb-4">{t.locations.city}</p>
+      <MapPin className="w-6 h-6 sm:w-8 sm:h-8 mx-auto mb-4 text-[#d4af37]" />
+      <h2 className="font-serif text-2xl sm:text-3xl mb-2">{t.locations.venue}</h2>
+      <p className="font-elegant text-base sm:text-lg text-white/80 mb-4">{t.locations.city}</p>
       <motion.a
         href="https://maps.app.goo.gl/3VdKW4L4PqTVDmyW7"
         target="_blank"
@@ -357,7 +357,7 @@ const CountdownScreen = ({ t, hasVisited }: { t: any; hasVisited: boolean }) => 
           return (
             <motion.div
               key={i}
-              className="bg-white w-28 h-28 rounded-2xl shadow-sm flex flex-col items-center justify-center border border-neutral-100 overflow-hidden"
+              className="bg-white w-24 h-24 sm:w-28 sm:h-28 rounded-2xl shadow-sm flex flex-col items-center justify-center border border-neutral-100 overflow-hidden"
               initial={hasVisited ? { y: 0, opacity: 1, scale: 1 } : { y: 20, opacity: 0, scale: 0.9 }}
               animate={{ y: 0, opacity: 1, scale: 1 }}
               transition={{ delay: hasVisited ? 0 : 0.2 + (i * 0.1), type: 'spring', damping: 15 }}
@@ -468,8 +468,8 @@ const MessageScreen = ({ t, hasVisited }: { t: any; hasVisited: boolean }) => (
       whileInView={{ scale: 1, opacity: 1 }}
       transition={{ duration: 1 }}
     >
-      <AnimatedHeart className="w-8 h-8 mx-auto mb-8 text-[#d4af37]/60" hasVisited={hasVisited} />
-      <div className="font-elegant text-xl leading-relaxed text-neutral-700 italic space-y-4">
+      <AnimatedHeart className="w-6 h-6 sm:w-8 sm:h-8 mx-auto mb-6 sm:mb-8 text-[#d4af37]/60" hasVisited={hasVisited} />
+      <div className="font-elegant text-lg sm:text-xl leading-relaxed text-neutral-700 italic space-y-3 sm:space-y-4">
         {Array.isArray(t.message) ? (
           t.message.map((line: string, i: number) => (
             <TypewriterText
@@ -575,9 +575,9 @@ const UniversalPrayerScreen = ({ t, hasVisited }: { t: any; hasVisited: boolean 
         <div className="w-8 h-[1px] bg-[#d4af37]/20" />
       </div>
 
-      <h2 className="font-serif text-3xl text-neutral-800 tracking-tight mb-8 font-bold">{t.prayerTitle}</h2>
+      <h2 className="font-serif text-2xl sm:text-3xl text-neutral-800 tracking-tight mb-6 sm:mb-8 font-bold">{t.prayerTitle}</h2>
 
-      <div className="font-elegant text-xl leading-relaxed text-neutral-700 italic tracking-wide space-y-4">
+      <div className="font-elegant text-lg sm:text-xl leading-relaxed text-neutral-700 italic tracking-wide space-y-3 sm:space-y-4">
         {t.prayerLines.map((line: string, idx: number) => (
           <TypewriterText
             key={idx}
@@ -697,7 +697,7 @@ const ThankYouScreen = ({ t, hasVisited, lang }: { t: any; hasVisited: boolean; 
           {t.celebrateMessage.map((line: string, i: number) => (
             <motion.span
               key={i}
-              className={i === 1 ? "text-[#d4af37] italic font-elegant text-3xl my-2" : "block text-2xl"}
+              className={i === 1 ? "text-[#d4af37] italic font-elegant text-2xl sm:text-3xl my-1 sm:my-2" : "block text-xl sm:text-2xl"}
               initial={hasVisited ? { opacity: 1, y: 0 } : { opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: hasVisited ? 0 : 0.5 + (i * 0.2) }}
@@ -719,12 +719,12 @@ const ThankYouScreen = ({ t, hasVisited, lang }: { t: any; hasVisited: boolean; 
           transition={{ delay: hasVisited ? 0 : 1.2 }}
         >
           <p className="font-elegant text-xl text-[#d4af37] italic mb-6 tracking-wide">{t.withLove}</p>
-          <div className="space-y-2">
-            <p className="font-serif text-3xl text-neutral-800 tracking-wider">
+          <div className="space-y-1 sm:space-y-2">
+            <p className="font-serif text-2xl sm:text-3xl text-neutral-800 tracking-wider">
               {groomName}
             </p>
-            <p className="font-elegant text-xl text-[#d4af37]">&</p>
-            <p className="font-serif text-3xl text-neutral-800 tracking-wider">
+            <p className="font-elegant text-lg sm:text-xl text-[#d4af37]">&</p>
+            <p className="font-serif text-2xl sm:text-3xl text-neutral-800 tracking-wider">
               {brideName}
             </p>
           </div>
