@@ -4,6 +4,8 @@ export const weddingData = {
   couple: {
     bride: "Rutuja",
     groom: "Shubham",
+    brideMr: "ऋतुजा",
+    groomMr: "शुभम",
     brideFull: "Rutuja",
     groomFull: "Shubham"
   },
@@ -21,15 +23,15 @@ export const weddingData = {
       id: 1,
       name: "Haldi Ceremony",
       date: "April 29, 2026",
-      time: "09:00 AM",
-      location: "Ashirwad Colony, Sambhajipur",
+      time: "07:00 PM",
+      location: "Suvatsalya Mangal Karyalay",
       icon: "Sparkles"
     },
     {
       id: 2,
       name: "Saptpadi",
       date: "April 30, 2026",
-      time: "09:36 AM",
+      time: "09:15 AM",
       location: "Suvatsalya Mangal Karyalay",
       icon: "Footprints"
     },
@@ -50,15 +52,4 @@ export const weddingData = {
       icon: "Heart"
     }
   ],
-  guests: [
-    { name: "The Family & Friends", avatar: "https://i.pravatar.cc/150?u=family" },
-    { name: "The Bennett Family", avatar: "https://i.pravatar.cc/150?u=bennett" },
-    { name: "The Sterling Family", avatar: "https://i.pravatar.cc/150?u=sterling" },
-    { name: "Julian & Maria Rossi", avatar: "https://i.pravatar.cc/150?u=rossi" },
-    { name: "David Chen", avatar: "https://i.pravatar.cc/150?u=david" },
-    { name: "Sarah Miller", avatar: "https://i.pravatar.cc/150?u=sarah" },
-    { name: "Robert & Elena Vance", avatar: "https://i.pravatar.cc/150?u=vance" },
-    { name: "Michael Thompson", avatar: "https://i.pravatar.cc/150?u=michael" },
-    { name: "Jessica Williams", avatar: "https://i.pravatar.cc/150?u=jessica" }
-  ]
 };

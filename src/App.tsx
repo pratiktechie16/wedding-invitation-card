@@ -4,6 +4,16 @@ import { weddingData } from './data/weddingData';
 import { translations } from './translations';
 import { Heart, MapPin, Calendar, Users, ChevronDown, ChevronUp, X, Languages, Volume2, VolumeX } from 'lucide-react';
 import * as Icons from 'lucide-react';
+import { Music } from 'lucide-react';
+
+// Import songs
+import song1 from './audio/song2.mp3';
+import song2 from './audio/song1.mp3';
+
+const songs = [
+  { id: 1, name: 'Song 1', src: song1 },
+  { id: 2, name: 'Song 2', src: song2 },
+];
 
 // --- Components ---
 
@@ -90,7 +100,73 @@ const FallingPetals = () => {
   );
 };
 
-const InvitationCard = ({ onOpen, t }: { onOpen: () => void; t: any; key?: string }) => {
+const ClickEffect = () => {
+  const [ripples, setRipples] = useState<{ id: number; x: number; y: number }[]>([]);
+
+  useEffect(() => {
+    const handleClick = (e: MouseEvent | TouchEvent) => {
+      const clientX = 'touches' in e ? (e.touches[0]?.clientX || 0) : (e as MouseEvent).clientX;
+      const clientY = 'touches' in e ? (e.touches[0]?.clientY || 0) : (e as MouseEvent).clientY;
+
+      const newRipple = {
+        id: Date.now() + Math.random(),
+        x: clientX,
+        y: clientY
+      };
+
+      setRipples(prev => [...prev.slice(-10), newRipple]); // Keep only last 10 ripple groups for performance
+      setTimeout(() => {
+        setRipples(prev => prev.filter(r => r.id !== newRipple.id));
+      }, 2000);
+    };
+
+    window.addEventListener('mousedown', handleClick, { passive: true });
+    window.addEventListener('touchstart', handleClick, { passive: true });
+    return () => {
+      window.removeEventListener('mousedown', handleClick);
+      window.removeEventListener('touchstart', handleClick);
+    };
+  }, []);
+
+  return (
+    <div className="fixed inset-0 pointer-events-none z-[300] overflow-hidden">
+      <AnimatePresence>
+        {ripples.map(ripple => (
+          <div key={ripple.id} className="absolute overflow-visible" style={{ left: ripple.x, top: ripple.y }}>
+            {/* Three concentric rings */}
+            {[0, 1, 2].map(i => (
+              <motion.div
+                key={`${ripple.id}-${i}`}
+                initial={{ opacity: 0, scale: 0 }}
+                animate={{
+                  opacity: [0, 0.25, 0],
+                  scale: [0, 4 + i]
+                }}
+                exit={{ opacity: 0 }}
+                transition={{
+                  duration: 2 + i * 0.2,
+                  delay: i * 0.1,
+                  ease: [0.1, 0.2, 0.3, 1]
+                }}
+                className="absolute -translate-x-1/2 -translate-y-1/2 rounded-full border border-[#d4af37]/20 shadow-[0_0_5px_rgba(212,175,55,0.05)]"
+                style={{
+                  width: 40,
+                  height: 40,
+                  background: 'radial-gradient(circle, rgba(212,175,55,0.02) 0%, transparent 70%)'
+                }}
+              />
+            ))}
+          </div>
+        ))}
+      </AnimatePresence>
+    </div>
+  );
+};
+
+const InvitationCard = ({ onOpen, t, lang }: { onOpen: () => void; t: any; lang: string; key?: string }) => {
+  const groomName = lang === 'mr' ? weddingData.couple.groomMr : weddingData.couple.groom;
+  const brideName = lang === 'mr' ? weddingData.couple.brideMr : weddingData.couple.bride;
+
   return (
     <motion.div
       className="w-full h-full flex flex-col items-center justify-center bg-[#fdfbf7] p-8 text-center relative"
@@ -114,9 +190,9 @@ const InvitationCard = ({ onOpen, t }: { onOpen: () => void; t: any; key?: strin
 
         <h2 className="font-elegant text-sm uppercase tracking-[0.3em] text-[#d4af37] mb-6">{t.weddingOf}</h2>
         <h1 className="font-serif text-4xl mb-4 text-neutral-800 leading-tight">
-          {weddingData.couple.groom}<br />
+          {groomName}<br />
           <span className="text-2xl font-elegant italic text-[#d4af37]">&</span><br />
-          {weddingData.couple.bride}
+          {brideName}
         </h1>
         <div className="space-y-1">
           <p className="font-elegant text-lg italic text-neutral-500">{t.saveTheDate}</p>
@@ -148,37 +224,42 @@ const InvitationCard = ({ onOpen, t }: { onOpen: () => void; t: any; key?: strin
   );
 };
 
-const HeroScreen = ({ t, hasVisited }: { t: any; hasVisited: boolean }) => (
-  <motion.div
-    className="w-full h-full flex flex-col items-center justify-center bg-white p-8 text-center"
-    initial={hasVisited ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-    animate={{ opacity: 1, y: 0 }}
-    exit={{ opacity: 0, y: -20 }}
-  >
+const HeroScreen = ({ t, hasVisited, lang }: { t: any; hasVisited: boolean; lang: string }) => {
+  const groomName = lang === 'mr' ? weddingData.couple.groomMr : weddingData.couple.groom;
+  const brideName = lang === 'mr' ? weddingData.couple.brideMr : weddingData.couple.bride;
+
+  return (
     <motion.div
-      initial={hasVisited ? { scale: 1, opacity: 1 } : { scale: 0.8, opacity: 0 }}
-      animate={{ scale: 1, opacity: 1 }}
-      transition={{ delay: hasVisited ? 0 : 0.2, duration: 0.8 }}
-      className="mb-8"
+      className="w-full h-full flex flex-col items-center justify-center bg-white p-8 text-center"
+      initial={hasVisited ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -20 }}
     >
-      <div className="w-20 h-[1px] bg-[#d4af37] mx-auto mb-8" />
-      <h1 className="font-serif text-5xl mb-4 text-neutral-800 leading-tight">
-        {weddingData.couple.groom}<br />
-        <span className="text-3xl font-elegant italic text-[#d4af37]">&</span><br />
-        {weddingData.couple.bride}
-      </h1>
-      <div className="w-20 h-[1px] bg-[#d4af37] mx-auto mt-8" />
+      <motion.div
+        initial={hasVisited ? { scale: 1, opacity: 1 } : { scale: 0.8, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        transition={{ delay: hasVisited ? 0 : 0.2, duration: 0.8 }}
+        className="mb-8"
+      >
+        <div className="w-20 h-[1px] bg-[#d4af37] mx-auto mb-8" />
+        <h1 className="font-serif text-5xl mb-4 text-neutral-800 leading-tight">
+          {groomName}<br />
+          <span className="text-3xl font-elegant italic text-[#d4af37]">&</span><br />
+          {brideName}
+        </h1>
+        <div className="w-20 h-[1px] bg-[#d4af37] mx-auto mt-8" />
+      </motion.div>
+      <motion.p
+        className="font-elegant text-xl text-neutral-500 tracking-wide"
+        initial={hasVisited ? { opacity: 1 } : { opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: hasVisited ? 0 : 0.6 }}
+      >
+        {t.gettingMarried}
+      </motion.p>
     </motion.div>
-    <motion.p
-      className="font-elegant text-xl text-neutral-500 tracking-wide"
-      initial={hasVisited ? { opacity: 1 } : { opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ delay: hasVisited ? 0 : 0.6 }}
-    >
-      {t.gettingMarried}
-    </motion.p>
-  </motion.div>
-);
+  );
+};
 
 const LocationScreen = ({ t, hasVisited }: { t: any; hasVisited: boolean }) => (
   <motion.div
@@ -312,13 +393,13 @@ const CountdownScreen = ({ t, hasVisited }: { t: any; hasVisited: boolean }) => 
         transition={{ delay: hasVisited ? 0 : 1 }}
       >
         <Calendar className="w-5 h-5 mx-auto mb-2 text-[#d4af37]" />
-        <p className="font-serif text-lg text-neutral-700">April 30th, 2026</p>
+        <p className="font-serif text-lg text-neutral-700">April 30, 2026</p>
       </motion.div>
     </motion.div>
   );
 };
 
-const TypewriterText = ({ text, hasVisited }: { text: string; hasVisited: boolean }) => {
+const TypewriterText = ({ text, hasVisited, delayOffset = 0 }: { text: string; hasVisited: boolean; delayOffset?: number }) => {
   const words = text.split(" ");
 
   return (
@@ -330,7 +411,7 @@ const TypewriterText = ({ text, hasVisited }: { text: string; hasVisited: boolea
           animate={{ opacity: 1, y: 0 }}
           transition={{
             duration: 0.4,
-            delay: hasVisited ? 0 : i * 0.08,
+            delay: hasVisited ? 0 : delayOffset + (i * 0.08),
             ease: "easeOut"
           }}
           className="inline-block"
@@ -387,9 +468,20 @@ const MessageScreen = ({ t, hasVisited }: { t: any; hasVisited: boolean }) => (
       whileInView={{ scale: 1, opacity: 1 }}
       transition={{ duration: 1 }}
     >
-      <Heart className="w-8 h-8 mx-auto mb-8 text-[#d4af37]/40" />
-      <div className="font-elegant text-2xl leading-relaxed text-neutral-700 italic">
-        <TypewriterText text={`"${t.message}"`} hasVisited={hasVisited} />
+      <AnimatedHeart className="w-8 h-8 mx-auto mb-8 text-[#d4af37]/60" hasVisited={hasVisited} />
+      <div className="font-elegant text-xl leading-relaxed text-neutral-700 italic space-y-4">
+        {Array.isArray(t.message) ? (
+          t.message.map((line: string, i: number) => (
+            <TypewriterText
+              key={i}
+              text={i === 0 ? `"${line}` : (i === t.message.length - 1 ? `${line}"` : line)}
+              hasVisited={hasVisited}
+              delayOffset={i * 1.5} // Stagger lines by 1.5 seconds
+            />
+          ))
+        ) : (
+          <TypewriterText text={`"${t.message}"`} hasVisited={hasVisited} />
+        )}
       </div>
       <div className="mt-10 h-[1px] w-12 bg-[#d4af37]/30 mx-auto" />
     </motion.div>
@@ -472,8 +564,9 @@ const UniversalPrayerScreen = ({ t, hasVisited }: { t: any; hasVisited: boolean 
 
     <motion.div
       className="flex flex-col items-center relative z-10"
-      initial={hasVisited ? { scale: 1, opacity: 1, y: 0 } : { scale: 0.95, opacity: 0, y: 20 }}
-      animate={{ scale: 1, opacity: 1, y: 0 }}
+      initial={hasVisited ? { scale: 1, opacity: 1 } : { scale: 0.95, opacity: 0 }}
+      whileInView={{ scale: 1, opacity: 1 }}
+      viewport={{ once: true }}
       transition={{ duration: 1 }}
     >
       <div className="mb-8 flex items-center justify-center gap-4">
@@ -484,16 +577,14 @@ const UniversalPrayerScreen = ({ t, hasVisited }: { t: any; hasVisited: boolean 
 
       <h2 className="font-serif text-3xl text-neutral-800 tracking-tight mb-8 font-bold">{t.prayerTitle}</h2>
 
-      <div className="font-elegant text-xl leading-[1.8] text-neutral-700 italic tracking-wide space-y-4">
+      <div className="font-elegant text-xl leading-relaxed text-neutral-700 italic tracking-wide space-y-4">
         {t.prayerLines.map((line: string, idx: number) => (
-          <motion.div
+          <TypewriterText
             key={idx}
-            initial={hasVisited ? { opacity: 1, y: 0 } : { opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: hasVisited ? 0 : 0.8 + (idx * 0.4), duration: 0.8 }}
-          >
-            <TypewriterText text={line} hasVisited={hasVisited} />
-          </motion.div>
+            text={line}
+            hasVisited={hasVisited}
+            delayOffset={0.5 + (idx * 1.5)}
+          />
         ))}
       </div>
 
@@ -505,32 +596,161 @@ const UniversalPrayerScreen = ({ t, hasVisited }: { t: any; hasVisited: boolean 
     </motion.div>
   </motion.div>
 );
-
-const ThankYouScreen = ({ t, hasVisited }: { t: any; hasVisited: boolean }) => (
-  <motion.div
-    className="w-full h-full flex flex-col items-center justify-center bg-white p-10 text-center"
-    initial={hasVisited ? { opacity: 1 } : { opacity: 0 }}
-    animate={{ opacity: 1 }}
-  >
-    <motion.div
-      initial={hasVisited ? { y: 0, opacity: 1 } : { y: 20, opacity: 0 }}
-      animate={{ y: 0, opacity: 1 }}
-      transition={{ duration: 1 }}
-    >
-      <h2 className="font-serif text-4xl mb-6 text-neutral-800 leading-tight">
-        {t.celebrateMessage.split('celebrate')[0]}<br /><span className="text-[#d4af37] italic font-elegant">celebrate</span><br />{t.celebrateMessage.split('celebrate')[1]}
-      </h2>
-      <p className="font-elegant text-xl text-[#d4af37] italic mb-12">{t.withLove}</p>
-      <p className="font-serif text-2xl text-neutral-700">{weddingData.couple.groom} & {weddingData.couple.bride}</p>
-
-      <div className="mt-16 flex justify-center gap-4">
-        <div className="w-2 h-2 rounded-full bg-[#d4af37]/20" />
-        <div className="w-2 h-2 rounded-full bg-[#d4af37]/40" />
-        <div className="w-2 h-2 rounded-full bg-[#d4af37]/20" />
-      </div>
-    </motion.div>
-  </motion.div>
+const InterlinkedHearts = ({ className, hasVisited }: { className?: string; hasVisited: boolean }) => (
+  <svg viewBox="0 0 100 60" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
+    {/* Right Heart (Goes behind top-left of Left Heart) */}
+    <motion.path
+      d="M65 45 C55 35 45 25 45 15 A 8 8 0 0 1 61 15 L 65 20 L 69 15 A 8 8 0 0 1 85 15 C 85 25 75 35 65 45"
+      stroke="currentColor"
+      strokeWidth="3"
+      strokeLinecap="round"
+      initial={hasVisited ? { pathLength: 1, opacity: 1 } : { pathLength: 0, opacity: 0 }}
+      animate={{ pathLength: 1, opacity: 1 }}
+      transition={{ duration: 1.5, delay: hasVisited ? 0 : 0.5 }}
+      style={{ rotate: '15deg', originX: '65px', originY: '30px' }}
+    />
+    {/* Left Heart (Goes behind bottom-right of Right Heart) */}
+    <motion.path
+      d="M35 45 C25 35 15 25 15 15 A 8 8 0 0 1 31 15 L 35 20 L 39 15 A 8 8 0 0 1 55 15 C 55 25 45 35 35 45"
+      stroke="currentColor"
+      strokeWidth="3"
+      strokeLinecap="round"
+      initial={hasVisited ? { pathLength: 1, opacity: 1 } : { pathLength: 0, opacity: 0 }}
+      animate={{ pathLength: 1, opacity: 1 }}
+      transition={{ duration: 1.5, delay: hasVisited ? 0 : 0.8 }}
+      style={{ rotate: '-15deg', originX: '35px', originY: '30px' }}
+    />
+    {/* Small segment of Right Heart to create the interlink (Overlapping Left Heart) */}
+    <motion.path
+      d="M45 15 A 8 8 0 0 1 53 15"
+      stroke="currentColor"
+      strokeWidth="3"
+      strokeLinecap="round"
+      initial={hasVisited ? { pathLength: 1, opacity: 1 } : { pathLength: 0, opacity: 0 }}
+      animate={{ pathLength: 1, opacity: 1 }}
+      transition={{ duration: 0.5, delay: hasVisited ? 0 : 2.3 }}
+      style={{ rotate: '15deg', originX: '65px', originY: '30px' }}
+    />
+  </svg>
 );
+
+const AnimatedHeart = ({ className, hasVisited }: { className?: string; hasVisited: boolean }) => (
+  <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
+    <motion.path
+      d="M50 85 C20 65 5 45 5 25 A 20 20 0 1 1 45 25 L 50 30 L 55 25 A 20 20 0 1 1 95 25 C 95 45 80 65 50 85"
+      stroke="currentColor"
+      strokeWidth="5"
+      strokeLinecap="round"
+      initial={hasVisited ? { pathLength: 1, opacity: 1 } : { pathLength: 0, opacity: 0 }}
+      animate={{ pathLength: 1, opacity: 1 }}
+      transition={{ duration: 2, delay: hasVisited ? 0 : 0.5, ease: "easeInOut" }}
+    />
+  </svg>
+);
+
+const ThankYouScreen = ({ t, hasVisited, lang }: { t: any; hasVisited: boolean; lang: string }) => {
+  const groomName = lang === 'mr' ? "शुभम" : weddingData.couple.groom;
+  const brideName = lang === 'mr' ? "ऋतुजा" : weddingData.couple.bride;
+
+  return (
+    <motion.div
+      className="w-full h-full flex flex-col items-center justify-center bg-[#fdfbf7] p-10 text-center relative overflow-hidden"
+      initial={hasVisited ? { opacity: 1 } : { opacity: 0 }}
+      animate={{ opacity: 1 }}
+    >
+      {/* Premium Parchment Texture Background */}
+      <div className="absolute inset-0 opacity-[0.4] pointer-events-none z-0" style={{
+        backgroundImage: `url("https://www.transparenttextures.com/patterns/paper-fibers.png")`,
+      }} />
+
+      {/* Corner Floral Accents - Top Right and Bottom Left */}
+      <div className="absolute top-4 right-4 w-24 h-24 opacity-20 pointer-events-none z-10 rotate-90">
+        <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" className="text-[#d4af37]">
+          <path d="M0 0C50 0 100 50 100 100M0 20C40 20 80 60 80 100M0 40C30 40 60 70 60 100" stroke="currentColor" strokeWidth="1" />
+          <circle cx="10" cy="10" r="2" fill="currentColor" />
+        </svg>
+      </div>
+      <div className="absolute bottom-4 left-4 w-24 h-24 opacity-20 pointer-events-none z-10 -rotate-90">
+        <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" className="text-[#d4af37]">
+          <path d="M0 0C50 0 100 50 100 100M0 20C40 20 80 60 80 100M0 40C30 40 60 70 60 100" stroke="currentColor" strokeWidth="1" />
+          <circle cx="10" cy="10" r="2" fill="currentColor" />
+        </svg>
+      </div>
+
+      <motion.div
+        className="relative z-10"
+        initial={hasVisited ? { y: 0, opacity: 1 } : { y: 30, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ duration: 1.2, ease: "easeOut" }}
+      >
+        <motion.div
+          initial={hasVisited ? { scale: 1, opacity: 1 } : { scale: 0.8, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ delay: hasVisited ? 0 : 0.3, duration: 0.8 }}
+          className="mb-8"
+        >
+          <InterlinkedHearts className="w-16 h-12 mx-auto text-[#d4af37]/60 mb-4" hasVisited={hasVisited} />
+          <div className="w-16 h-[1px] bg-[#d4af37]/30 mx-auto" />
+        </motion.div>
+
+        <div className="font-serif mb-8 text-neutral-800 leading-tight tracking-tight flex flex-col items-center">
+          {t.celebrateMessage.map((line: string, i: number) => (
+            <motion.span
+              key={i}
+              className={i === 1 ? "text-[#d4af37] italic font-elegant text-3xl my-2" : "block text-2xl"}
+              initial={hasVisited ? { opacity: 1, y: 0 } : { opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: hasVisited ? 0 : 0.5 + (i * 0.2) }}
+            >
+              {line}
+            </motion.span>
+          ))}
+        </div>
+
+        <div className="flex items-center justify-center gap-4 mb-10">
+          <div className="w-12 h-[1px] bg-[#d4af37]/20" />
+          <div className="w-2 h-2 rounded-full border border-[#d4af37]/40" />
+          <div className="w-12 h-[1px] bg-[#d4af37]/20" />
+        </div>
+
+        <motion.div
+          initial={hasVisited ? { opacity: 1 } : { opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: hasVisited ? 0 : 1.2 }}
+        >
+          <p className="font-elegant text-xl text-[#d4af37] italic mb-6 tracking-wide">{t.withLove}</p>
+          <div className="space-y-2">
+            <p className="font-serif text-3xl text-neutral-800 tracking-wider">
+              {groomName}
+            </p>
+            <p className="font-elegant text-xl text-[#d4af37]">&</p>
+            <p className="font-serif text-3xl text-neutral-800 tracking-wider">
+              {brideName}
+            </p>
+          </div>
+        </motion.div>
+
+        <div className="mt-16 flex justify-center gap-6">
+          <motion.div
+            animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0.6, 0.3] }}
+            transition={{ duration: 3, repeat: Infinity }}
+            className="w-1.5 h-1.5 rounded-full bg-[#d4af37]"
+          />
+          <motion.div
+            animate={{ scale: [1, 1.2, 1], opacity: [0.6, 1, 0.6] }}
+            transition={{ duration: 3, repeat: Infinity, delay: 0.5 }}
+            className="w-1.5 h-1.5 rounded-full bg-[#d4af37]"
+          />
+          <motion.div
+            animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0.6, 0.3] }}
+            transition={{ duration: 3, repeat: Infinity, delay: 1 }}
+            className="w-1.5 h-1.5 rounded-full bg-[#d4af37]"
+          />
+        </div>
+      </motion.div>
+    </motion.div>
+  );
+};
 
 // --- Main App ---
 
@@ -542,6 +762,7 @@ export default function App() {
   const [lang, setLang] = useState<'en' | 'mr'>('en');
   const [isMuted, setIsMuted] = useState(false);
   const [visitedScreens, setVisitedScreens] = useState<number[]>([]);
+  const [currentSongIndex, setCurrentSongIndex] = useState(0);
   const isScrolling = React.useRef(false);
   const audioRef = useRef<HTMLAudioElement>(null);
 
@@ -566,6 +787,17 @@ export default function App() {
     }
   };
 
+  const nextSong = () => {
+    const nextIndex = (currentSongIndex + 1) % songs.length;
+    setCurrentSongIndex(nextIndex);
+    // Restart playback of the new song if it was playing
+    if (audioRef.current && !isMuted && isOpen) {
+      setTimeout(() => {
+        audioRef.current?.play().catch(e => console.log("Playback error:", e));
+      }, 0);
+    }
+  };
+
   const handleOpen = () => {
     setIsOpen(true);
     if (audioRef.current) {
@@ -575,12 +807,12 @@ export default function App() {
 
   const screens = [
     <UniversalPrayerScreen t={t} hasVisited={visitedScreens.includes(0)} />,
-    <HeroScreen t={t} hasVisited={visitedScreens.includes(1)} />,
+    <HeroScreen t={t} hasVisited={visitedScreens.includes(1)} lang={lang} />,
     <LocationScreen t={t} hasVisited={visitedScreens.includes(2)} />,
     <CountdownScreen t={t} hasVisited={visitedScreens.includes(3)} />,
     <MessageScreen t={t} hasVisited={visitedScreens.includes(4)} />,
     <EventsScreen t={t} hasVisited={visitedScreens.includes(5)} />,
-    <ThankYouScreen t={t} hasVisited={visitedScreens.includes(6)} />
+    <ThankYouScreen t={t} hasVisited={visitedScreens.includes(6)} lang={lang} />
   ];
 
   const handleNext = () => {
@@ -637,14 +869,17 @@ export default function App() {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-[#f8f7f4] relative overflow-hidden">
+    <div className="flex items-center justify-center min-h-[100dvh] bg-[#f8f7f4] relative overflow-hidden">
+      {/* Global Bubble Click Effect */}
+      <ClickEffect />
+
       {/* Flower Petals Animation (Moved to background) */}
       {isOpen && <FallingPetals />}
 
       {/* Background Music */}
       <audio
         ref={audioRef}
-        src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3"
+        src={songs[currentSongIndex].src}
         loop
       />
 
@@ -663,6 +898,25 @@ export default function App() {
       </div>
 
       <div className="fixed top-4 right-4 z-[100] flex items-center gap-3">
+        {/* Music Switcher
+        {isOpen && (
+          <motion.button
+            initial={{ scale: 0, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={nextSong}
+            className="bg-white/80 backdrop-blur-md border border-[#d4af37]/30 p-3 rounded-full shadow-lg flex items-center justify-center text-[#d4af37] relative group"
+            title={`Switch to ${songs[(currentSongIndex + 1) % songs.length].name}`}
+          >
+            <Music className="w-4 h-4" />
+            <span className="absolute -bottom-8 left-1/2 -translate-x-1/2 bg-neutral-800 text-white text-[10px] px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+              {songs[currentSongIndex].name}
+            </span>
+          </motion.button>
+        )}
+        */}
+
         {/* Music Toggle */}
         {isOpen && (
           <motion.button
@@ -678,10 +932,10 @@ export default function App() {
         )}
       </div>
 
-      <div className="relative w-full max-w-[450px] h-screen sm:h-[90vh] bg-white sm:rounded-[2rem] shadow-2xl overflow-hidden sm:border-8 sm:border-white">
+      <div className="relative w-full max-w-[450px] h-[100dvh] sm:h-[90vh] bg-white sm:rounded-[2rem] shadow-2xl overflow-hidden sm:border-8 sm:border-white">
         <AnimatePresence mode="wait">
           {!isOpen ? (
-            <InvitationCard key="invitation" onOpen={handleOpen} t={t} />
+            <InvitationCard key="invitation" onOpen={handleOpen} t={t} lang={lang} />
           ) : (
             <motion.div
               key="content"
